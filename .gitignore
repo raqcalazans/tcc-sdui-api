@@ -1,0 +1,86 @@
+# ==========================================
+# Java / Spring Boot
+# ==========================================
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+
+# ==========================================
+# Arquivos empacotados
+# ==========================================
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ==========================================
+# Logs de erro da JVM
+# ==========================================
+hs_err_pid*
+
+# ==========================================
+# Maven
+# ==========================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ==========================================
+# Gradle
+# ==========================================
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ==========================================
+# IntelliJ IDEA
+# ==========================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ==========================================
+# Eclipse
+# ==========================================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ==========================================
+# Visual Studio Code
+# ==========================================
+.vscode/
+
+# ==========================================
+# macOS
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# ==========================================
+# Variáveis de Ambiente e Segurança
+# ==========================================
+.env
+*.env
+application-secret.properties
+application-local.yml
+application-local.properties
