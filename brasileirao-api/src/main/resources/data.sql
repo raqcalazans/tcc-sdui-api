@@ -30,31 +30,31 @@ INSERT INTO filter_groups (title, display_order) VALUES
 --- INSERÇÃO DOS JOGOS (ASSOCIADOS ÀS RODADAS) ---
 -- Jogos da 1ª Rodada (FINALIZADOS)
 INSERT INTO games (home_team_id, away_team_id, home_goals, away_goals, game_date_time, stadium, filter_group_id, is_live) VALUES
-((SELECT id FROM teams WHERE acronym = 'FLA'), (SELECT id FROM teams WHERE acronym = 'COR'), 2, 0, '2025-07-20T19:00:00Z', 'Maracanã, Rio de Janeiro', (SELECT id FROM filter_groups WHERE title = '1ª RODADA'), FALSE),
-((SELECT id FROM teams WHERE acronym = 'PAL'), (SELECT id FROM teams WHERE acronym = 'VAS'), 3, 1, '2025-07-20T21:30:00Z', 'Allianz Parque, São Paulo', (SELECT id FROM filter_groups WHERE title = '1ª RODADA'), FALSE);
+((SELECT id FROM teams WHERE acronym = 'FLA'), (SELECT id FROM teams WHERE acronym = 'COR'), 2, 0, '2026-09-06T19:00:00Z', 'Maracanã, Rio de Janeiro', (SELECT id FROM filter_groups WHERE title = '1ª RODADA'), FALSE),
+((SELECT id FROM teams WHERE acronym = 'PAL'), (SELECT id FROM teams WHERE acronym = 'VAS'), 3, 1, '2026-09-06T21:30:00Z', 'Allianz Parque, São Paulo', (SELECT id FROM filter_groups WHERE title = '1ª RODADA'), FALSE);
 
 -- Jogos da 2ª Rodada (FINALIZADOS, aconteceram no fim de semana)
 INSERT INTO games (home_team_id, away_team_id, home_goals, away_goals, game_date_time, stadium, filter_group_id, is_live) VALUES
-((SELECT id FROM teams WHERE acronym = 'SAO'), (SELECT id FROM teams WHERE acronym = 'GRE'), 1, 1, '2025-07-26T19:00:00Z', 'Morumbi, São Paulo', (SELECT id FROM filter_groups WHERE title = '2ª RODADA'), FALSE),
-((SELECT id FROM teams WHERE acronym = 'INT'), (SELECT id FROM teams WHERE acronym = 'BOT'), 0, 2, '2025-07-27T19:00:00Z', 'Beira-Rio, Porto Alegre', (SELECT id FROM filter_groups WHERE title = '2ª RODADA'), FALSE);
+((SELECT id FROM teams WHERE acronym = 'SAO'), (SELECT id FROM teams WHERE acronym = 'GRE'), 1, 1, '2026-09-12T19:00:00Z', 'Morumbi, São Paulo', (SELECT id FROM filter_groups WHERE title = '2ª RODADA'), FALSE),
+((SELECT id FROM teams WHERE acronym = 'INT'), (SELECT id FROM teams WHERE acronym = 'BOT'), 0, 2, '2026-09-13T19:00:00Z', 'Beira-Rio, Porto Alegre', (SELECT id FROM filter_groups WHERE title = '2ª RODADA'), FALSE);
 
 -- Jogos da 3ª Rodada (AGENDADOS para o próximo fim de semana)
 INSERT INTO games (home_team_id, away_team_id, home_goals, away_goals, game_date_time, stadium, filter_group_id, is_live) VALUES
-((SELECT id FROM teams WHERE acronym = 'FLU'), (SELECT id FROM teams WHERE acronym = 'CAP'), NULL, NULL, '2025-08-02T19:00:00Z', 'Maracanã, Rio de Janeiro', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE),
-((SELECT id FROM teams WHERE acronym = 'CRU'), (SELECT id FROM teams WHERE acronym = 'SAN'), NULL, NULL, '2025-08-02T21:30:00Z', 'Mineirão, Belo Horizonte', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE),
-((SELECT id FROM teams WHERE acronym = 'CAM'), (SELECT id FROM teams WHERE acronym = 'SPO'), NULL, NULL, '2025-08-03T19:00:00Z', 'Arena MRV, Belo Horizonte', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE);
+((SELECT id FROM teams WHERE acronym = 'FLU'), (SELECT id FROM teams WHERE acronym = 'CAP'), NULL, NULL, '2026-09-19T19:00:00Z', 'Maracanã, Rio de Janeiro', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE),
+((SELECT id FROM teams WHERE acronym = 'CRU'), (SELECT id FROM teams WHERE acronym = 'SAN'), NULL, NULL, '2026-09-19T21:30:00Z', 'Mineirão, Belo Horizonte', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE),
+((SELECT id FROM teams WHERE acronym = 'CAM'), (SELECT id FROM teams WHERE acronym = 'SPO'), NULL, NULL, '2026-09-20T19:00:00Z', 'Arena MRV, Belo Horizonte', (SELECT id FROM filter_groups WHERE title = '3ª RODADA'), FALSE);
 
 --- INSERÇÃO DOS EVENTOS DE JOGO ---
 -- Eventos Jogo 1ª Rodada: FLA 2x0 COR
 INSERT INTO game_events (description, event_time, game_id) VALUES
-('Começa o jogo!', '2025-07-20T19:00:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
-('Gol do Flamengo! Arrascaeta abre o placar.', '2025-07-20T19:40:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
-('Pedro amplia para o Flamengo!', '2025-07-20T20:31:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
-('Fim de jogo.', '2025-07-20T20:52:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR'));
+('Começa o jogo!', '2026-09-06T19:00:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
+('Gol do Flamengo! Arrascaeta abre o placar.', '2026-09-06T19:40:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
+('Pedro amplia para o Flamengo!', '2026-09-06T20:31:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR')),
+('Fim de jogo.', '2026-09-06T20:52:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'FLA' AND at.acronym = 'COR'));
 
 -- Eventos Jogo 2ª Rodada: INT 0x2 BOT
 INSERT INTO game_events (description, event_time, game_id) VALUES
-('Apita o árbitro, bola rolando no Beira-Rio!', '2025-07-27T19:00:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
-('GOL DO BOTAFOGO! Tiquinho Soares abre o placar.', '2025-07-27T19:22:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
-('GOL DO BOTAFOGO! Eduardo amplia para o Glorioso.', '2025-07-27T20:15:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
-('Fim de jogo!', '2025-07-27T20:54:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT'));
+('Apita o árbitro, bola rolando no Beira-Rio!', '2026-09-13T19:00:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
+('GOL DO BOTAFOGO! Tiquinho Soares abre o placar.', '2026-09-13T19:22:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
+('GOL DO BOTAFOGO! Eduardo amplia para o Glorioso.', '2026-09-13T20:15:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT')),
+('Fim de jogo!', '2026-09-13T20:54:00Z', (SELECT g.id FROM games g JOIN teams ht ON g.home_team_id = ht.id JOIN teams at ON g.away_team_id = at.id WHERE ht.acronym = 'INT' AND at.acronym = 'BOT'));
