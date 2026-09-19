@@ -15,26 +15,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/fans") // Alterado para /fans para centralizar a criação e gerir as rotas adequadamente
+@RequestMapping("/fans")
 public class FanController {
 
     private final FanRegisterScreenFactory screenFactory;
-    private final FanService fanService; // Declarado aqui
+    private final FanService fanService;
 
-    // Injeção de dependências via construtor unificado
     public FanController(FanRegisterScreenFactory screenFactory, FanService fanService) {
         this.screenFactory = screenFactory;
         this.fanService = fanService;
     }
 
-    // O app iOS bate neste endpoint para pedir a tela (mantém o prefixo /ui se preferir, ou direto aqui)
     @GetMapping("/registration-screen")
     public ResponseEntity<FormScreenDTO> getRegistrationScreen() {
         FormScreenDTO screen = screenFactory.buildRegistrationScreen();
         return ResponseEntity.ok(screen);
     }
-
-    // Endpoint POST para receber os dados do formulário submetidos pelo app iOS
+    
     @PostMapping
     public ResponseEntity<Fan> createFan(@RequestBody FanDTO fanDTO) {
         Fan savedFan = fanService.saveFan(fanDTO);
