@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      analysis_ref:
+        description: 'Branch, tag, or full commit SHA to analyze (leave empty for the triggering commit)'
+        required: false
+        default: ''
   schedule:
     - cron: '23 8 * * 1'
 
@@ -14,14 +19,28 @@ permissions:
 jobs:
   metrics:
     runs-on: ubuntu-latest
+    env:
+      ANALYSIS_REF_INPUT: ${{ inputs.analysis_ref }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        id: checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.analysis_ref || github.sha }}
+      - name: Record analyzed commit
+        id: analyzed
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Install pinned analyzer
         run: python -m pip install lizard==1.17.31
@@ -31,22 +50,99 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p metrics
-          lizard --language java --csv src/main/java > metrics/lizard-java.csv
+          candidates=()
+          while IFS= read -r file; do candidates+=("$file"); done \
+            < <(find src/main/java -type f -name '*.java' | sort)
+          java_files=()
+          excluded_files=()
+          for file in "${candidates[@]}"; do
+            case "$file" in
+              */generated/*|*/generated-sources/*|*/target/*|*/build/*|*Generated.java)
+                excluded_files+=("$file")
+                ;;
+              *) java_files+=("$file") ;;
+            esac
+          done
+          if [[ ${#java_files[@]} -eq 0 ]]; then
+            echo 'No production Java files found.' >&2
+            exit 1
+          fi
+          printf '%s\n' "${java_files[@]}" > metrics/source-files-included.txt
+          if [[ ${#excluded_files[@]} -gt 0 ]]; then
+            printf '%s\n' "${excluded_files[@]}" > metrics/source-files-excluded.txt
+          else
+            : > metrics/source-files-excluded.txt
+          fi
+          lizard --language java --csv "${java_files[@]}" > metrics/lizard-java.csv
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+
+          csv_path = Path("metrics/lizard-java.csv")
+          rows = list(csv.reader(csv_path.open(newline="", encoding="utf-8")))
+          if not rows:
+              raise SystemExit("Lizard CSV has no function/method rows")
+          for line_number, row in enumerate(rows, start=1):
+              if len(row) != 11:
+                  raise SystemExit(f"CSV row {line_number}: expected 11 columns, got {len(row)}")
+              for index in (0, 1, 2, 3, 4, 9, 10):
+                  try:
+                      value = int(row[index])
+                  except ValueError as error:
+                      raise SystemExit(f"CSV row {line_number}, column {index + 1}: not an integer") from error
+                  if value < 0:
+                      raise SystemExit(f"CSV row {line_number}, column {index + 1}: negative value")
+              if not row[6] or not row[7] or int(row[10]) < int(row[9]):
+                  raise SystemExit(f"CSV row {line_number}: invalid source/function/line range")
+          Path("metrics/csv-validation.txt").write_text(
+              f"status=valid\nfunction_or_method_rows={len(rows)}\ncolumn_count=11\n",
+              encoding="utf-8",
+          )
+          Path("metrics/csv-schema.txt").write_text(
+              "1=NLOC (non-comment lines per function/method)\n"
+              "2=CCN (cyclomatic complexity)\n"
+              "3=token_count\n"
+              "4=parameter_count\n"
+              "5=function_length (source lines)\n"
+              "6=location_label\n"
+              "7=source_file\n"
+              "8=function_name\n"
+              "9=qualified_function_signature\n"
+              "10=start_line\n"
+              "11=end_line\n",
+              encoding="utf-8",
+          )
+          PY
           {
             echo "repository=${GITHUB_REPOSITORY}"
-            echo "commit=${GITHUB_SHA}"
+            echo "commit=$(git rev-parse HEAD)"
             echo "ref=${GITHUB_REF}"
+            echo "requested_analysis_ref=${ANALYSIS_REF_INPUT:-triggering-commit}"
+            echo "event_name=${GITHUB_EVENT_NAME}"
             echo "captured_at_utc=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+            echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "workflow_ref=${GITHUB_WORKFLOW_REF}"
+            echo "workflow_sha=${GITHUB_WORKFLOW_SHA}"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_image_os=${ImageOS:-unavailable}"
+            echo "runner_image_version=${ImageVersion:-unavailable}"
+            echo "python_version=$(python --version 2>&1)"
             echo "lizard_version=$(lizard --version 2>&1 | head -n 1)"
             echo "java_version=$(java -version 2>&1 | head -n 1 || true)"
-            echo "source_scope=src/main/java"
-            echo "excluded=src/test, generated code, dependencies, build output"
+            echo "source_scope=Java files under src/main/java"
+            echo "source_candidates=${#candidates[@]}"
+            echo "source_files_analyzed=${#java_files[@]}"
+            echo "source_files_excluded=${#excluded_files[@]}"
+            echo "exclusion_rules=src/test outside scope; */generated/*; */generated-sources/*; */target/*; */build/*; *Generated.java"
+            echo "csv_sha256=$(shasum -a 256 metrics/lizard-java.csv | awk '{print $1}')"
           } > metrics/metadata.txt
 
       - name: Preserve raw results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: api-static-metrics-${{ github.sha }}
+          name: api-static-metrics-${{ steps.analyzed.outputs.sha }}-run-${{ github.run_id }}
           path: metrics/
           if-no-files-found: error
           retention-days: 90
