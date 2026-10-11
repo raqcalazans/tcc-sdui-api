@@ -1,0 +1,52 @@
+name: API static code metrics
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 8 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned analyzer
+        run: python -m pip install lizard==1.17.31
+
+      - name: Collect Java source metrics
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p metrics
+          lizard --language java --csv src/main/java > metrics/lizard-java.csv
+          {
+            echo "repository=${GITHUB_REPOSITORY}"
+            echo "commit=${GITHUB_SHA}"
+            echo "ref=${GITHUB_REF}"
+            echo "captured_at_utc=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "lizard_version=$(lizard --version 2>&1 | head -n 1)"
+            echo "java_version=$(java -version 2>&1 | head -n 1 || true)"
+            echo "source_scope=src/main/java"
+            echo "excluded=src/test, generated code, dependencies, build output"
+          } > metrics/metadata.txt
+
+      - name: Preserve raw results
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-static-metrics-${{ github.sha }}
+          path: metrics/
+          if-no-files-found: error
+          retention-days: 90
