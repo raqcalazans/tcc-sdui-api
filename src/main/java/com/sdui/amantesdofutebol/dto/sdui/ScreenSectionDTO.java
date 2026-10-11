@@ -7,10 +7,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class ComponentDTO {
+public class ScreenSectionDTO {
     private String id;
-    private String type;
-    private String label;
-    private boolean required;
-    private List<OptionDTO> options;
+    private String title;
+    private List<ScreenComponentDTO> components;
 }

@@ -1,8 +1,8 @@
 package com.sdui.amantesdofutebol.controller;
 
 import com.sdui.amantesdofutebol.dto.FanDTO;
-import com.sdui.amantesdofutebol.dto.sdui.FormScreenDTO;
-import com.sdui.amantesdofutebol.factory.FanRegisterScreenFactory;
+import com.sdui.amantesdofutebol.dto.sdui.ScreenDefinitionDTO;
+import com.sdui.amantesdofutebol.factory.FanScreenFactory;
 import com.sdui.amantesdofutebol.service.FanService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,15 +16,15 @@ import java.util.List;
 public class FanController {
 
     private final FanService fanService;
-    private final FanRegisterScreenFactory screenFactory;
+    private final FanScreenFactory screenFactory;
 
-    public FanController(FanService fanService, FanRegisterScreenFactory screenFactory) {
+    public FanController(FanService fanService, FanScreenFactory screenFactory) {
         this.fanService = fanService;
         this.screenFactory = screenFactory;
     }
 
     @GetMapping("/registration-screen")
-    public ResponseEntity<FormScreenDTO> getRegistrationScreen() {
+    public ResponseEntity<ScreenDefinitionDTO> getRegistrationScreen() {
         return ResponseEntity.ok(screenFactory.buildRegistrationScreen());
     }
 
