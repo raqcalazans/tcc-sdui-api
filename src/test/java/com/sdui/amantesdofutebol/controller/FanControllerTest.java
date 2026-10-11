@@ -1,8 +1,8 @@
 package com.sdui.amantesdofutebol.controller;
 
 import com.sdui.amantesdofutebol.dto.FanDTO;
-import com.sdui.amantesdofutebol.dto.sdui.FormScreenDTO;
-import com.sdui.amantesdofutebol.factory.FanRegisterScreenFactory;
+import com.sdui.amantesdofutebol.dto.sdui.ScreenDefinitionDTO;
+import com.sdui.amantesdofutebol.factory.FanScreenFactory;
 import com.sdui.amantesdofutebol.model.StadiumFrequency;
 import com.sdui.amantesdofutebol.service.FanService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class FanControllerTest {
 
     @Mock private FanService fanService;
-    @Mock private FanRegisterScreenFactory screenFactory;
+    @Mock private FanScreenFactory screenFactory;
     private FanController controller;
 
     @BeforeEach
@@ -32,7 +32,8 @@ class FanControllerTest {
 
     @Test
     void getRegistrationScreenDelegatesToFactory() {
-        FormScreenDTO screen = FormScreenDTO.builder().screenTitle("Cadastro de fã").build();
+        ScreenDefinitionDTO screen = ScreenDefinitionDTO.builder().screenId("fan-registration")
+                .screenTitle("Cadastro de fã").screenType("FORM").build();
         when(screenFactory.buildRegistrationScreen()).thenReturn(screen);
 
         var response = controller.getRegistrationScreen();
